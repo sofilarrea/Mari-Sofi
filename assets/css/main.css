@@ -4883,3 +4883,8 @@ input[type="tel"]:focus {
 .wx__day .i{font-size:1.25rem}
 .wx__day .t{color:#374151;font-size:.9rem}
 @media (max-width:480px){.wx__forecast{grid-template-columns:repeat(3,1fr)}}
+#lanzarote{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
