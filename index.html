@@ -173,94 +173,134 @@
 					<footer id="footer">
 						<section>
 							<h2>Formulario de confirmación a la boda</h2>
-							<form id="rsvp-form" method="post" action="#">
-								<div class="fields">
+													<form id="rsvp-form" method="post" action="#">
+							<div class="fields">
 
-									<div class="field">
-									<label for="name">Nombre</label>
-									<input type="text" name="name" id="name" />
-									</div>
+								<!-- Nombre -->
+								<div class="field">
+								<label for="name">Nombre</label>
+								<input type="text" name="name" id="name" required />
+								</div>
 
-									<div class="field">
-									<label for="phone">Teléfono</label>
-									<input type="text" name="phone" id="phone" />
-									</div>
+								<!-- Teléfono -->
+								<div class="field">
+								<label for="phone">Teléfono</label>
+								<input type="text" name="phone" id="phone" required />
+								</div>
 
-									<div class="field">
-									<label for="email">Email</label>
-									<input type="email" name="email" id="email" />
-									</div>
+								<!-- Email -->
+								<div class="field">
+								<label for="email">Email</label>
+								<input type="email" name="email" id="email" required />
+								</div>
 
-									<div class="field">
-									<label>¿Asistirás a la boda?</label>
+								<!-- Asistencia -->
+								<div class="field">
+								<label>¿Asistirás a la boda?</label>
+								<div class="options-inline">
+									<label class="button small">
+									<input type="radio" name="asistira" value="Sí" required>
+									<span>Sí</span>
+									</label>
+									<label class="button small">
+									<input type="radio" name="asistira" value="No" required>
+									<span>No</span>
+									</label>
+								</div>
+								</div>
+
+								<!-- Campos extra (solo si elige Sí) -->
+								<div id="extra-fields" style="display:none; margin-top:1rem;">
+
+								<!-- Cantidad personas -->
+								<div class="field">
+									<label>¿Cuántas personas asistirán?</label>
+									<select name="cantidad_personas">
+									<option value="">Selecciona...</option>
+									<option value="1">1 persona</option>
+									<option value="2">2 personas</option>
+									<option value="3">3 personas</option>
+									<option value="4">4 personas</option>
+									</select>
+								</div>
+
+								<!-- Niños -->
+								<div class="field" id="niños">
+									<label>¿Lleva niños?</label>
 									<div class="options-inline">
-										<label class="button small">
-										<input type="radio" name="asistira" value="Sí" required> Sí
-										</label>
-										<label class="button small">
-										<input type="radio" name="asistira" value="No" required> No
-										</label>
+									<label class="button small">
+										<input type="radio" name="lleva_ninos" value="Sí">
+										<span>Sí</span>
+									</label>
+									<label class="button small">
+										<input type="radio" name="lleva_ninos" value="No">
+										<span>No</span>
+									</label>
 									</div>
-									</div>
+								</div>
+								</div>
 
-									<div class="field">
-									<label>¿Necesitarás transporte?</label>
-									<div class="options-inline">
-										<label class="button small">
-										<input type="checkbox" name="transporte" value="Sí"> Sí
-										</label>
-									
-										<label class="button small">
-										<input type="checkbox" name="transporte" value="No"> No
-										</label>
-									
-									</div>
+								<!-- Transporte -->
+								<div class="field">
+								<label>¿Necesitarás transporte el día de la boda?</label>
+								<div class="options-inline">
+									<label class="button small">
+									<input type="radio" name="transporte" value="Sí">
+									<span>Sí</span>
+									</label>
+									<label class="button small">
+									<input type="radio" name="transporte" value="No">
+									<span>No</span>
+									</label>
+								</div>
+								</div>
 
+								<!-- Restricciones alimentarias -->
 								<div class="field dietary">
 								<label>¿Tenés restricciones alimentarias?</label>
 
 								<div class="dietary__toggle">
 									<button type="button" id="dietary-yes" class="button small">Sí</button>
-									<button type="button" id="dietary-no"  class="button small">No</button>
+									<button type="button" id="dietary-no" class="button small">No</button>
 								</div>
 
 								<div id="diet-options" class="dietary__options" hidden>
 									<label class="dietary__chk">
 									<input type="checkbox" name="restricciones[]" value="celiaco">
-									<span class="box" aria-hidden="true"></span>
+									<span class="box"></span>
 									<span class="txt">Celíaco/a / Sin gluten</span>
 									</label>
 
 									<label class="dietary__chk">
 									<input type="checkbox" name="restricciones[]" value="vegetariano">
-									<span class="box" aria-hidden="true"></span>
+									<span class="box"></span>
 									<span class="txt">Vegetariano/a</span>
 									</label>
 
 									<label class="dietary__chk">
 									<input type="checkbox" name="restricciones[]" value="vegano">
-									<span class="box" aria-hidden="true"></span>
+									<span class="box"></span>
 									<span class="txt">Vegano/a</span>
 									</label>
 
 									<label class="dietary__chk">
 									<input type="checkbox" id="diet-otros" value="otros">
-									<span class="box" aria-hidden="true"></span>
+									<span class="box"></span>
 									<span class="txt">Otros</span>
 									</label>
 
-									<input type="text" id="diet-otros-text" name="otros"
-										class="dietary__otros" placeholder="Especificar" hidden>
+									<input type="text" id="diet-otros-text" name="otros" class="dietary__otros" placeholder="Especificar" hidden>
 								</div>
 								</div>
 
 							</div>
 
+							<!-- Botón enviar -->
 							<ul class="actions">
 								<li><input id="send-btn" type="submit" value="Enviar confirmación" /></li>
 							</ul>
 
-							<!-- opcional para feedback -->
+							<!-- Feedback -->
 							<p id="form-status" aria-live="polite"></p>
 							</form>
 

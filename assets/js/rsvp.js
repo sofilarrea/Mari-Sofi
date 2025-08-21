@@ -1,170 +1,144 @@
 // ============================
-// CONFIG EmailJS
+// EmailJS - Config
 // ============================
-const PUBLIC_KEY  = "9hkNO9AX2_ckTsIxO"; 
+const PUBLIC_KEY  = "9hkNO9AX2_ckTsIxO";
 const SERVICE_ID  = "service_zy2z9au";
 const TEMPLATE_ID = "template_qpb8os5";
 
 // ============================
-// MAIN SCRIPT
+// Utiles
+// ============================
+function qs(sel, root=document){ return root.querySelector(sel); }
+function qsa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
+
+// ============================
+// Main
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
-  // Inicializar EmailJS
+  // --- Init EmailJS (UNA sola vez)
   emailjs.init(PUBLIC_KEY);
 
-  const yesBtn   = document.getElementById("dietary-yes");
-  const noBtn    = document.getElementById("dietary-no");
-  const dietBox  = document.getElementById("diet-options");
-  const otrosCb  = document.getElementById("diet-otros");
-  const otrosTxt = document.getElementById("diet-otros-text");
+  const form         = qs("#rsvp-form");
+  const sendBtn      = qs("#send-btn");
+  const statusEl     = qs("#form-status");
 
-  // ---- Helpers de sessionStorage ----
-  function saveDietaryOpen(isOpen) {
-    sessionStorage.setItem("dietary_open", isOpen ? "1" : "0");
-  }
+  // ----- Asistirá -> muestra/oculta extra
+  const extraFields  = qs("#extra-fields");
+  const radiosAsist  = qsa('input[name="asistira"]');
 
-  function applySelectionsFromSession() {
-    // Asistirá
-    const asis = sessionStorage.getItem("asistira");
-    if (asis) {
-      const r = document.querySelector(`input[name="asistira"][value="${asis}"]`);
-      if (r) r.checked = true;
-    }
-
-    // Transporte
-    const transp = sessionStorage.getItem("transporte");
-    if (transp) {
-      const c = document.querySelector('input[name="transporte"]');
-      if (c) c.checked = (transp === "Sí");
-    }
-
-    // Restricciones
-    const restr = sessionStorage.getItem("restricciones");
-    const open  = sessionStorage.getItem("dietary_open") === "1";
-    if (open && dietBox) {
-      dietBox.hidden = false;
-      dietBox.classList.add("is-open");
-      yesBtn?.classList.add("is-active");
-      noBtn?.classList.remove("is-active");
-    }
-    if (restr) {
-      const vals = JSON.parse(restr);
-      document.querySelectorAll('input[name="restricciones[]"]').forEach(i => {
-        i.checked = vals.includes(i.value);
-      });
-    }
-
-    // Otros
-    const otroChk = sessionStorage.getItem("diet_otro_checked") === "1";
-    if (otrosCb && otrosTxt) {
-      otrosCb.checked = otroChk;
-      otrosTxt.hidden = !otroChk;
-      const txt = sessionStorage.getItem("diet_otro_txt") || "";
-      otrosTxt.value = txt;
-    }
-
-    // Marcar visual labels tipo botón (si usás estilos .is-active)
-    document.querySelectorAll('label.button.small').forEach(l => {
-      const inp = l.querySelector('input');
-      if (inp) l.classList.toggle('is-active', inp.checked);
-    });
-  }
-
-  // ---- Toggle restricciones ----
-  yesBtn?.addEventListener("click", () => {
-    dietBox.hidden = false;
-    dietBox.classList.add("is-open");
-    yesBtn.classList.add("is-active");
-    noBtn?.classList.remove("is-active");
-    saveDietaryOpen(true);
-  });
-
-  noBtn?.addEventListener("click", () => {
-    dietBox.classList.remove("is-open");
-    dietBox.hidden = true;
-    noBtn.classList.add("is-active");
-    yesBtn?.classList.remove("is-active");
-
-    // limpiar checks y otros
-    dietBox.querySelectorAll('input[type="checkbox"]').forEach(i => (i.checked = false));
-    if (otrosTxt) { otrosTxt.value = ""; otrosTxt.hidden = true; }
-
-    // limpiar sessionStorage relacionado
-    sessionStorage.setItem("restricciones", JSON.stringify([]));
-    sessionStorage.setItem("diet_otro_checked", "0");
-    sessionStorage.setItem("diet_otro_txt", "");
-    saveDietaryOpen(false);
-
-    // refrescar marcados visuales
-    document.querySelectorAll('label.button.small').forEach(l => {
-      const inp = l.querySelector('input');
-      if (inp) l.classList.toggle('is-active', inp.checked);
+  radiosAsist.forEach(r => {
+    r.addEventListener("change", () => {
+      if (r.checked && r.value === "Sí") {
+        extraFields.style.display = "block";
+        sessionStorage.setItem("asistira", "Sí");
+        sessionStorage.setItem("asistira_extra_open", "1");
+      } else if (r.checked && r.value === "No") {
+        extraFields.style.display = "none";
+        sessionStorage.setItem("asistira", "No");
+        sessionStorage.setItem("asistira_extra_open", "0");
+        // limpiar subcampos
+        const selPersonas = qs('select[name="cantidad_personas"]');
+        const radiosNinos = qsa('input[name="lleva_ninos"]');
+        if (selPersonas) selPersonas.value = "";
+        radiosNinos.forEach(n => n.checked = false);
+        sessionStorage.removeItem("cantidad_personas");
+        sessionStorage.removeItem("lleva_ninos");
+      }
     });
   });
 
-  if (otrosCb && otrosTxt) {
-    otrosCb.addEventListener("change", () => {
-      const show = otrosCb.checked;
-      otrosTxt.hidden = !show;
-      if (!show) otrosTxt.value = "";
-      sessionStorage.setItem("diet_otro_checked", show ? "1" : "0");
-      sessionStorage.setItem("diet_otro_txt", otrosTxt.value.trim());
-    });
-    otrosTxt.addEventListener("input", () => {
-      sessionStorage.setItem("diet_otro_txt", otrosTxt.value.trim());
-    });
+  // Restaurar apertura de extra desde sessionStorage (opcional)
+  if (sessionStorage.getItem("asistira_extra_open") === "1") {
+    extraFields.style.display = "block";
   }
 
-  // ---- Guardar cambios al seleccionar (sessionStorage) ----
-  document.addEventListener("change", (e) => {
-    const t = e.target;
-    if (t.name === "asistira" && t.checked) {
-      sessionStorage.setItem("asistira", t.value); // "Sí" | "No"
-    }
-    if (t.name === "transporte") {
-      sessionStorage.setItem("transporte", t.checked ? "Sí" : "No");
-    }
-    if (t.name === "restricciones[]") {
-      const vals = Array.from(document.querySelectorAll('input[name="restricciones[]"]:checked'))
-        .map(i => i.value);
-      sessionStorage.setItem("restricciones", JSON.stringify(vals));
+  // ----- “Lleva niños” y “Cantidad de personas” -> guardar en sessionStorage (opcional)
+  const selPersonas = qs('select[name="cantidad_personas"]');
+  selPersonas?.addEventListener('change', () =>
+    sessionStorage.setItem("cantidad_personas", selPersonas.value || "")
+  );
+
+  const radiosNinos = qsa('input[name="lleva_ninos"]');
+  radiosNinos.forEach(r => r.addEventListener('change', () => {
+    if (r.checked) sessionStorage.setItem("lleva_ninos", r.value); // "Sí" | "No"
+  }));
+
+  // ----- Transporte: 2 checkboxes -> forzar exclusividad + leer valor
+  const transpBoxes = qsa('input[name="transporte"]');
+  transpBoxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        // Desmarcar el otro para que quede exclusivo
+        transpBoxes.forEach(other => { if (other !== cb) other.checked = false; });
+      }
+    });
+  });
+
+  // ----- Restricciones alimentarias (sí/no + opciones + "otros")
+  const dietaryYes   = qs("#dietary-yes");
+  const dietaryNo    = qs("#dietary-no");
+  const dietOptions  = qs("#diet-options");
+  const dietOtros    = qs("#diet-otros");
+  const dietOtrosTxt = qs("#diet-otros-text");
+
+  dietaryYes?.addEventListener("click", () => {
+    dietOptions.hidden = false;
+    sessionStorage.setItem("dietary_open", "1");
+  });
+  dietaryNo?.addEventListener("click", () => {
+    dietOptions.hidden = true;
+    sessionStorage.setItem("dietary_open", "0");
+    // limpiar seleccionados
+    qsa('#diet-options input[type="checkbox"]').forEach(c => c.checked = false);
+    if (dietOtrosTxt) { dietOtrosTxt.hidden = true; dietOtrosTxt.value = ""; }
+  });
+  dietOtros?.addEventListener("change", () => {
+    const show = dietOtros.checked;
+    if (dietOtrosTxt) {
+      dietOtrosTxt.hidden = !show;
+      if (!show) dietOtrosTxt.value = "";
     }
   });
 
-  // ---- Restaurar al cargar (misma pestaña) ----
-  applySelectionsFromSession();
-
-  // ---- Formulario / EmailJS ----
-  const form   = document.getElementById("rsvp-form");
-  const btn    = document.getElementById("send-btn");
-  const status = document.getElementById("form-status");
-
+  // ============================
+  // Submit -> EmailJS
+  // ============================
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name      = form.querySelector('[name="name"]')?.value.trim()  || "";
-    const phone     = form.querySelector('[name="phone"]')?.value.trim() || "";
-    const email     = form.querySelector('[name="email"]')?.value.trim() || "";
-    const asistira  = form.querySelector('input[name="asistira"]:checked')?.value || "";
-    const transporte = form.querySelector('input[name="transporte"]')?.checked ? "Sí" : "No";
+    // Datos base
+    const name   = qs('#name')?.value.trim()  || "";
+    const phone  = qs('#phone')?.value.trim() || "";
+    const email  = qs('#email')?.value.trim() || "";
 
-    const seleccionadas = Array.from(form.querySelectorAll('input[name="restricciones[]"]:checked'))
-      .map(i => i.value);
-    const restricciones = (dietBox && !dietBox.hidden)
-      ? (seleccionadas.length ? seleccionadas.join(", ") : "Ninguna seleccionada")
-      : "No";
+    const asistira = qs('input[name="asistira"]:checked')?.value || "";
+    // Transporte: tomar el único checkbox marcado (exclusividad forzada)
+    const transpChecked = qsa('input[name="transporte"]').find(i => i.checked);
+    const transporte = transpChecked ? transpChecked.value : "";
 
-    const otros = (otrosCb?.checked) ? (otrosTxt?.value.trim() || "otros (sin especificar)") : "";
+    // Cantidad personas / niños
+    const cantidad_personas = qs('select[name="cantidad_personas"]')?.value || "";
+    const lleva_ninos = qs('input[name="lleva_ninos"]:checked')?.value || "";
 
+    // Restricciones: armar string desde checkboxes visibles
+    let restricciones = "No";
+    if (dietOptions && !dietOptions.hidden) {
+      const list = qsa('input[name="restricciones[]"]:checked').map(i => i.value);
+      restricciones = (list.length ? list.join(", ") : "Ninguna seleccionada");
+    }
+    const otros = dietOtros?.checked ? (dietOtrosTxt?.value.trim() || "otros (sin especificar)") : "";
+
+    // Validaciones mínimas
     if (!name || !email || !asistira) {
-      if (status) {
-        status.textContent = "Completá nombre, email y si asistirás.";
-        status.style.color = "#b00020";
+      if (statusEl) {
+        statusEl.textContent = "Completá nombre, email y si asistirás.";
+        statusEl.style.color = "#b00020";
       }
       return;
     }
 
-    const transporteFinal = (asistira === "No") ? "No aplica" : transporte;
+    // Si dijo "No" asistir, transporte “No aplica”
+    const transporteFinal = (asistira === "No") ? "No aplica" : (transporte || "No");
 
     const params = {
       name,
@@ -174,87 +148,30 @@ document.addEventListener("DOMContentLoaded", () => {
       transporte: transporteFinal,
       restricciones,
       otros,
+      cantidad_personas,
+      lleva_ninos
     };
 
     try {
-      if (btn) { btn.disabled = true; btn.value = "Enviando..."; }
-      if (status) { status.textContent = ""; }
+      if (sendBtn) { sendBtn.disabled = true; sendBtn.value = "Enviando..."; }
+      if (statusEl) { statusEl.textContent = "Enviando..."; statusEl.style.color = "#444"; }
 
       const res = await emailjs.send(SERVICE_ID, TEMPLATE_ID, params, PUBLIC_KEY);
-      console.log("[EmailJS] OK →", res);
+      console.log("[EmailJS] OK:", res);
 
-      if (status) {
-        status.textContent = "¡Gracias! Recibimos tu confirmación 💌";
-        status.style.color = "#0a7d32";
-      }
-
-      // ——— Opción 1: NO limpiar el formulario, así queda marcado tal cual
-      // (si preferís limpiar y reaplicar, usá la opción 2 de abajo)
-      // return;
-
-      // ——— Opción 2: limpiar y REAPLICAR lo guardado en sessionStorage
-      // form.reset();
-      // noBtn?.click(); // esto cierra el bloque; si querés reabrir si estaba abierto:
-      // if (sessionStorage.getItem("dietary_open") === "1") {
-      //   yesBtn?.click();
-      // }
-      // applySelectionsFromSession();
+      if (statusEl) { statusEl.textContent = "¡Confirmación enviada con éxito! 💌"; statusEl.style.color = "#0a7d32"; }
+      // Si querés conservar las selecciones, NO limpies:
+      // form.reset(); sessionStorage.clear();
+      // qs("#extra-fields").style.display = "none"; qs("#diet-options").hidden = true;
 
     } catch (err) {
-      console.error("[EmailJS] ERROR →", err);
-      if (status) {
-        status.textContent = "Error al enviar. Verificá IDs y 'Origins'.";
-        status.style.color = "#b00020";
-      }
+      console.error("[EmailJS] ERROR:", err);
+      if (statusEl) { statusEl.textContent = "❌ Error al enviar. Revisá Service/Template/Public Key y los Origins."; statusEl.style.color = "#b00020"; }
     } finally {
-      if (btn) { btn.disabled = false; btn.value = "Enviar confirmación"; }
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.value = "Enviar confirmación"; }
     }
   });
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  const setActive = (label, on) => label.classList.toggle('is-active', !!on);
-
-  // Marca/Desmarca todos los labels de un contenedor según el estado de sus inputs
-  const syncContainer = (container) => {
-    if (!container) return;
-    container.querySelectorAll('label').forEach(lbl => {
-      const inp = lbl.querySelector('input');
-      if (inp) setActive(lbl, inp.checked);
-    });
-  };
-
-  // Sincroniza al cargar
-  document.querySelectorAll('.options-inline, .dietary__options').forEach(syncContainer);
-
-  // Maneja cambios
-  document.addEventListener('change', (e) => {
-    const inp = e.target.closest('input');
-    if (!inp) return;
-    const label = inp.closest('label');
-    const container = label?.parentElement; // .options-inline o .dietary__options
-    if (!container) return;
-
-    // Si transporte está hecho con 2 checkboxes, forzamos exclusividad
-    if (inp.name === 'transporte' && inp.type === 'checkbox' && inp.checked) {
-      container.querySelectorAll(`input[name="${inp.name}"]`).forEach(other => {
-        if (other !== inp) {
-          other.checked = false;
-          const ol = other.closest('label');
-          if (ol) setActive(ol, false);
-        }
-      });
-    }
-
-    // Radios: limpiar hermanos y activar el actual
-    if (inp.type === 'radio') {
-      container.querySelectorAll('label').forEach(lbl => setActive(lbl, false));
-      setActive(label, true);
-    } else {
-      // Checkbox: solo toggle del actual
-      setActive(label, inp.checked);
-    }
-  });
-});
 
