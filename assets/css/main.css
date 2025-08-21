@@ -2602,7 +2602,7 @@ input, select, textarea {
 		}
 
 			.image.left img, .image.right img {
-				width: 100%;
+				width: 80%;
 			}
 
 		.image.left {
@@ -2613,7 +2613,7 @@ input, select, textarea {
 
 		.image.right {
 			float: right;
-			margin: 0 0 2rem 2rem;
+			margin: -13px 0 2rem 2rem;
 			top: 0.75rem;
 		}
 
@@ -4919,4 +4919,11 @@ div#extra-fields{
   color: #fff !important;
   border: solid 2px #18bfef !important;
   background-color: hsl(0, 0%, 100%) !important;
+}
+.image.main{
+	display: flex;
+	justify-content: center;
+}
+.image.main img{
+	width: 40%;
 }
