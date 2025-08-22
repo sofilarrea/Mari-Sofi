@@ -1,110 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Clima Lanzarote</title>
+  <meta charset="UTF-8" />
+  <title>Confirmación partido de pádel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{background:#f3f4f6;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;margin:0;padding:2rem}
-    .wx{max-width:640px;margin:0 auto;padding:1rem;border:1px solid #e5e7eb;border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-    .wx__header{display:flex;justify-content:space-between;align-items:center;gap:1rem}
-    .wx h3{margin:0;font-size:1.1rem;color:#111827}
-    .wx small{color:#6b7280}
-    .wx__now{display:flex;align-items:center;gap:.5rem}
-    #wx-temp{font-size:2.2rem;font-weight:700;color:#111827;line-height:1}
-    #wx-icon{font-size:1.8rem}
-    .wx__meta{display:flex;gap:1rem;flex-wrap:wrap;margin:.5rem 0 0;color:#374151;font-size:.95rem}
-    .wx__forecast{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.5rem;margin-top:.8rem}
-    .wx__day{padding:.6rem;border:1px solid #e5e7eb;border-radius:10px;text-align:center;background:#f9fafb}
-    .wx__day .d{font-weight:600;color:#111827}
-    .wx__day .i{font-size:1.25rem}
-    .wx__day .t{color:#374151;font-size:.9rem}
-    @media (max-width:480px){.wx__forecast{grid-template-columns:repeat(3,1fr)}}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.4;padding:24px}
+    h1{margin-top:0}
+    .card{max-width:560px}
+    .field{margin:14px 0}
+    .options-inline{display:flex;gap:16px}
+    label.button{display:inline-flex;align-items:center;gap:8px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 14px;cursor:pointer}
+    label.button input{margin:0}
+    .actions{margin-top:16px}
+    button, input[type=submit]{padding:10px 16px;border-radius:8px;border:1px solid #0ea5e9;background:#fff;color:#0ea5e9;font-weight:700;cursor:pointer}
+    #form-status{margin-top:12px}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Confirmación partido de pádel</h1>
 
-  <div id="wx-card" class="wx">
-    <div class="wx__header">
-      <div>
-        <h3>Lanzarote</h3>
-        <small id="wx-updated">—</small>
+    <!-- FORMULARIO -->
+    <form id="paddle-form" autocomplete="off">
+      <div class="field">
+        <label>¿Irás al partido de pádel?</label>
+        <div class="options-inline">
+          <label class="button">
+            <input type="radio" name="asistencia" value="Sí" required />
+            <span>Sí</span>
+          </label>
+          <label class="button">
+            <input type="radio" name="asistencia" value="No" required />
+            <span>No</span>
+          </label>
+        </div>
       </div>
-      <div class="wx__now">
-        <span id="wx-temp">--°</span>
-        <span id="wx-icon" aria-hidden="true">☀️</span>
+
+      <div class="actions">
+        <input id="send-btn" type="submit" value="Enviar confirmación" />
       </div>
-    </div>
 
-    <div class="wx__meta">
-      <span id="wx-desc">—</span>
-      <span>Viento: <strong id="wx-wind">—</strong> km/h</span>
-    </div>
-
-    <div class="wx__forecast" id="wx-forecast">
-      <!-- se completa por JS -->
-    </div>
+      <p id="form-status" aria-live="polite"></p>
+    </form>
   </div>
 
+  <!-- SDK de EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
   <script>
-  (function(){
-    const LAT = 28.97, LON = -13.65; // Lanzarote
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    // TUS CREDENCIALES
+    const PUBLIC_KEY  = "9hkNO9AX2_ckTsIxO";
+    const SERVICE_ID  = "service_zy2z9au";
+    const TEMPLATE_ID = "template_filwdlh";
 
-    const elTemp   = document.getElementById('wx-temp');
-    const elIcon   = document.getElementById('wx-icon');
-    const elDesc   = document.getElementById('wx-desc');
-    const elWind   = document.getElementById('wx-wind');
-    const elUpd    = document.getElementById('wx-updated');
-    const elFc     = document.getElementById('wx-forecast');
+    // Inicializar EmailJS
+    emailjs.init(PUBLIC_KEY);
 
-    const CODES = {
-      0:["☀️","Despejado"],1:["🌤️","Mayormente soleado"],2:["⛅","Parcialmente nublado"],3:["☁️","Nublado"],
-      45:["🌫️","Niebla"],48:["🌫️","Niebla"],
-      51:["🌦️","Llovizna débil"],53:["🌦️","Llovizna"],55:["🌧️","Llovizna fuerte"],
-      61:["🌦️","Lluvia débil"],63:["🌧️","Lluvia"],65:["🌧️","Lluvia intensa"],
-      66:["🌧️","Lluvia helada débil"],67:["🌧️","Lluvia helada"],
-      71:["🌨️","Nieve débil"],73:["🌨️","Nieve"],75:["🌨️","Nieve intensa"],
-      77:["🌨️","Granizo/nevisca"],
-      80:["🌦️","Chubascos débiles"],81:["🌧️","Chubascos"],82:["⛈️","Chubascos fuertes"],
-      95:["⛈️","Tormenta"],96:["⛈️","Tormenta con granizo"],99:["⛈️","Tormenta fuerte con granizo"]
-    };
+    // Envío del formulario
+    document.getElementById("paddle-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const status = document.getElementById("form-status");
+      const btn    = document.getElementById("send-btn");
 
-    function fmtDay(iso){
-      const d = new Date(iso);
-      return d.toLocaleDateString('es-ES',{weekday:'short'}).replace('.','');
-    }
+      btn.disabled = true;
+      status.textContent = "Enviando…";
 
-    fetch(url)
-      .then(r=>r.json())
-      .then(data=>{
-        const cw = data.current_weather;
-        const [emoji,desc] = CODES[cw.weathercode] || ["ℹ️","Tiempo"];
-        elTemp.textContent = Math.round(cw.temperature) + "°";
-        elIcon.textContent = emoji;
-        elDesc.textContent = desc;
-        elWind.textContent = Math.round(cw.windspeed);
-        elUpd.textContent  = "Actualizado: " + new Date(cw.time).toLocaleString('es-ES');
-
-        const days = data.daily.time.map((t,i)=>({
-          time:t, code:data.daily.weathercode[i],
-          tmax:Math.round(data.daily.temperature_2m_max[i]),
-          tmin:Math.round(data.daily.temperature_2m_min[i])
-        })).slice(0,5);
-
-        elFc.innerHTML = days.map(d=>{
-          const [e,dd] = CODES[d.code] || ["ℹ️",""];
-          return `<div class="wx__day">
-            <div class="d">${fmtDay(d.time)}</div>
-            <div class="i" title="${dd}">${e}</div>
-            <div class="t">${d.tmax}° / ${d.tmin}°</div>
-          </div>`;
-        }).join('');
-      })
-      .catch(err=>{
-        console.error(err);
-        elDesc.textContent="No se pudo cargar el clima.";
-      });
-  })();
+      emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
+        .then(() => {
+          status.textContent = "✅ Confirmación enviada con éxito";
+          btn.disabled = false;
+          this.reset();
+        })
+        .catch(err => {
+          console.error("EmailJS error:", err);
+          status.textContent = "❌ Error al enviar. Revisá Service ID, Template ID, Public Key y 'Origins'.";
+          btn.disabled = false;
+        });
+    });
   </script>
 </body>
 </html>

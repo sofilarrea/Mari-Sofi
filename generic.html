@@ -79,7 +79,7 @@
 								<p>Después de muchas visitas por cuestiones de pádel, nos dimos cuenta de que Lanzarote era el lugar ideal para casarnos. Su clima agradable durante todo el año, sus increíbles paisajes volcánicos y sus playas hermosas hacen de esta isla un escenario perfecto. Además, queremos que nuestros invitados puedan disfrutar no solo del gran día, sino también de unos días previos o posteriores al evento, descansando y celebrando junto a nosotros en este rincón único del mundo. 	</p>
 								<hr>
 								<p>Evento Pre-Boda 🎾
-Queremos arrancar la celebración de una forma distinta y muy nuestra. Como todos saben, el pádel es una de nuestras grandes pasiones, así que antes del gran día los invitamos a sumarse a un partido lleno de risas, buena onda y energía. Será la excusa perfecta para calentar motores, compartir un momento diferente y empezar a festejar juntos esta aventura.</p>
+								Queremos arrancar la celebración de una forma distinta y muy nuestra. Como todos saben, el pádel es una de nuestras grandes pasiones, así que antes del gran día los invitamos a sumarse a un partido lleno de risas, buena onda y energía. Será la excusa perfecta para calentar motores, compartir un momento diferente y empezar a festejar juntos esta aventura.</p>
 							</section> 
 						
 									<hr />
@@ -89,60 +89,80 @@ Queremos arrancar la celebración de una forma distinta y muy nuestra. Como todo
 				<!-- Footer -->
 					<footer id="footer">
 						<section>
-							<form method="post" action="#">
-								<div class="fields">
-									<div class="field">
-										<label for="name">Name</label>
-										<input type="text" name="name" id="name" />
-									</div>
-									<div class="field">
-										<label for="email">Email</label>
-										<input type="text" name="email" id="email" />
-									</div>
-									<div class="field">
-										<label for="message">Message</label>
-										<textarea name="message" id="message" rows="3"></textarea>
-									</div>
-								</div>
-								<ul class="actions">
-									<li><input type="submit" value="Send Message" /></li>
-								</ul>
-							</form>
+					<form id="paddle-form" method="post" action="#">
+						<!-- Nombre -->
+						<div class="field">
+							<label for="paddle-name">Tu nombre</label>
+							<input type="text" name="paddle_name" id="paddle-name" required />
+						</div>
+
+						<!-- Partido -->
+						<div class="field">
+							<label>¿Irás al partido de pádel?</label>
+							<div class="options-inline">
+							<label class="button small">
+								<input type="radio" name="ira_partido" value="Sí" required> Sí
+							</label>
+							<label class="button small">
+								<input type="radio" name="ira_partido" value="No" required> No
+							</label>
+							</div>
+						</div>
+
+						<!-- Evento extra (solo si NO juega al partido) -->
+						<div id="evento-extra" style="display:none; margin-top:1rem;">
+							<div class="field">
+							<label>¿Aunque no juegues, asistirás al evento?</label>
+							<div class="options-inline">
+								<label class="button small">
+								<input type="radio" name="ira_evento" value="Sí"> Sí
+								</label>
+								<label class="button small">
+								<input type="radio" name="ira_evento" value="No"> No
+								</label>
+							</div>
+							</div>
+						</div>
+
+						<!-- Enviar -->
+						<ul class="actions">
+							<li><input id="paddle-send-btn" type="submit" value="Enviar respuesta" /></li>
+						</ul>
+
+						<p id="paddle-status" aria-live="polite"></p>
+						</form>
+
+
+
+
 						</section>
 						<section class="split contact">
 							<section class="alt">
 								<h3>Address</h3>
-								<p>1234 Somewhere Road #87257<br />
-								Nashville, TN 00000-0000</p>
+								<p>SportClub Puerto Calero - C. Princesa Guayarmina, 1A, 35571 Puerto Calero, Las Palmas, España</p>
 							</section>
 							<section>
-								<h3>Phone</h3>
-								<p><a href="#">(000) 000-0000</a></p>
+								<h3>Día</h3>
+								<p>6 de Marzo a las 17:00 horas</p>
 							</section>
 							<section>
-								<h3>Email</h3>
-								<p><a href="#">info@untitled.tld</a></p>
+								<h3>Porque en el amor, como en el paddle lo importante es jugar en equipo</h3>
+							
 							</section>
-							<section>
-								<h3>Social</h3>
-								<ul class="icons alt">
-									<li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
-									<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
-									<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
-									<li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
-								</ul>
-							</section>
+							
 						</section>
 					</footer>
 
 				<!-- Copyright -->
 					<div id="copyright">
-						<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+						<ul><li>Made by:  Sofi</li></ul>
 					</div>
 
 			</div>
 
 		<!-- Scripts -->
+			<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 			<script src="assets/js/jquery.min.js"></script>
 			<script src="assets/js/jquery.scrollex.min.js"></script>
 			<script src="assets/js/jquery.scrolly.min.js"></script>
@@ -151,5 +171,6 @@ Queremos arrancar la celebración de una forma distinta y muy nuestra. Como todo
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script src="assets/js/weather.js"></script>
+			<script src="assets/js/partido.js"></script>
 	</body>
 </html>

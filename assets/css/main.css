@@ -98,9 +98,7 @@ input, select, textarea {
 		box-sizing: inherit;
 	}
 
-	body {
-		background-color: #1e252d;
-	}
+	
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
 			-moz-animation: none !important;
@@ -143,9 +141,7 @@ input, select, textarea {
 
 		}
 
-	body {
-		color: #212931;
-	}
+
 
 	body, input, select, textarea {
 		font-family: "Merriweather", Georgia, serif;
@@ -3235,7 +3231,7 @@ input, select, textarea {
 			width: 100%;
 			height: 100%;
 			background-color: #212931;
-			background-image: url("../../images/hero3.jpg"), linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("../../images/ChatGPT\ Image\ 13\ ago\ 2025\,\ 07_53_54.png");
+			background-image: url("../../images/ChatGPT\ Image\ 13\ ago\ 2025\,\ 07_53_54.png"), linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("../../images/ChatGPT\ Image\ 13\ ago\ 2025\,\ 07_53_54.png");
 			background-size: auto,								auto,														100% auto;
 			background-repeat: no-repeat,								no-repeat,													no-repeat;
 			background-attachment: scroll,								scroll,														scroll;
@@ -4916,7 +4912,7 @@ div#extra-fields{
 /* Solo estado checked */
 .options-inline label.button.small:has(> input:checked),
 .dietary__options label:has(> input:checked) {
-  color: #fff !important;
+ 
   border: solid 2px #18bfef !important;
   background-color: hsl(0, 0%, 100%) !important;
 }
@@ -4926,4 +4922,39 @@ div#extra-fields{
 }
 .image.main img{
 	width: 40%;
+}
+.paddle{
+	margin-top: 2rem;
+}
+.split-wrapper {
+  display: flex;
+  align-items: stretch;  /* las dos columnas llegan hasta el mismo alto */
+}
+
+.split-wrapper > .col {
+  flex: 1;
+  background: transparent; /* no tapa la foto */
+}
+/* 1) La foto VA en el contenedor que envuelve ambas columnas */
+.seccion-rsvp {                      /* usa tu clase real de la sección */
+  position: relative;
+  background: url('/ruta/a/tu-foto.jpg') center/cover no-repeat;
+}
+
+/* 2) Asegurá que la sección ENCierre a sus hijos (si están con floats) */
+.seccion-rsvp .split-wrapper {
+  display: flow-root;   /* clearfix moderno; contiene floats */
+  /* Si preferís, podés usar flex:
+     display:flex; align-items:stretch;  */
+}
+
+/* 3) Las columnas sin fondo para que se vea la foto detrás */
+.seccion-rsvp .split-wrapper > * {
+  background: transparent;
+}
+
+/* 4) Por si el theme mete un overlay/panel oscuro con pseudo-elementos */
+.seccion-rsvp::before,
+.seccion-rsvp::after {
+  background: none !important;
 }
